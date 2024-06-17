@@ -1,0 +1,50 @@
+const int ledPin = 10; // Pin number connected to the transistor for the LED strip
+const int fanPin = 11; // Pin number connected to the transistor for the fan
+
+unsigned long previousMillis = 0;
+const unsigned long intervalOn = 10UL * 60 * 60 * 1000; // 10 
+const unsigned long intervalOff = 14UL * 60 * 60 * 1000; // 14 
+bool isLedOn = true; // Start with the LED on
+
+void setup() {
+  pinMode(ledPin, OUTPUT); // Set the pin as output for the LED strip
+  pinMode(fanPin, OUTPUT); // Set the pin as output for the fan
+  
+  // Turn on the fan at 100% power
+  analogWrite(fanPin, 255);
+  
+  // Initialize time
+  previousMillis = millis();
+
+  // Gradually turn on the LED strip at startup
+  for (int brightness = 0; brightness <= 255; brightness++) {
+    analogWrite(ledPin, brightness);
+    delay(20); // Increase delay for slower brightness change
+  }
+}
+
+void loop() {
+  unsigned long currentMillis = millis();
+
+  if (isLedOn) {
+    if (currentMillis - previousMillis >= intervalOn) {
+      // Gradually turn off the LED strip
+      for (int brightness = 255; brightness >= 0; brightness--) {
+        analogWrite(ledPin, brightness);
+        delay(20); // Increase delay for slower brightness change
+      }
+      isLedOn = false;
+      previousMillis = currentMillis; // Update the last state change time
+    }
+  } else {
+    if (currentMillis - previousMillis >= intervalOff) {
+      // Gradually turn on the LED strip
+      for (int brightness = 0; brightness <= 255; brightness++) {
+        analogWrite(ledPin, brightness);
+        delay(20); // Increase delay for slower brightness change
+      }
+      isLedOn = true;
+      previousMillis = currentMillis; // Update the last state change time
+    }
+  }
+}
